@@ -1,4 +1,7 @@
 # SDL Sketches
+
+[![Play in your browser](https://img.shields.io/badge/Play-in%20your%20browser-2ea44f)](https://danielstephenson.dev/play/sdl-sketches)
+
 Three small programs written by Daniel Stephenson in C++ with [SDL2](https://www.libsdl.org) in January 2020, built for the browser with [Emscripten](https://emscripten.org) and served together as one site.
 
 | Sketch | Source repository | What it does |
