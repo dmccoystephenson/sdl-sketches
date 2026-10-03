@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>@TITLE@ · SDL Sketches</title>
+<script>
+  // Touch devices get the on-screen controls in place of the keyboard hint.
+  if (window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0) {
+    document.documentElement.classList.add('touch');
+  }
+</script>
+<style>
+  :root { --bg: #f5f4f0; --fg: #1f1e1b; --muted: #5f5d57; --line: #d9d6cd; --pad: #e4e1d8; --pad-active: #c9c4b6; --accent: #2b5d8a; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151514; --fg: #e8e6e0; --muted: #a29f97; --line: #393833; --pad: #2a2926; --pad-active: #46443f; --accent: #8ab8e0; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1000px; margin: 0 auto; padding: 16px; text-align: center; }
+  nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; margin: 0 0 12px; font-size: 0.95rem; }
+  nav a { color: var(--accent); text-decoration: none; padding: 4px 2px; }
+  nav a[aria-current="page"] { color: var(--fg); font-weight: 600; border-bottom: 2px solid var(--fg); }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  .hint { color: var(--muted); margin: 0 0 12px; font-size: 0.95rem; }
+  .hint > span, .controls { display: none; }
+  #canvas { display: block; width: 100% !important; height: auto !important;
+    aspect-ratio: @WIDTH@ / @HEIGHT@; margin: 0 auto; background: #fff; outline: none;
+    border: 1px solid var(--line); touch-action: none; }
+  #status { color: var(--muted); margin: 8px 0; min-height: 1.2em; }
+  .controls { margin: 12px auto 0; user-select: none; -webkit-user-select: none; }
+  .controls button { font: inherit; font-size: 1.4rem; border: 0; border-radius: 14px; margin: 3px;
+    background: var(--pad); color: var(--fg); touch-action: none; -webkit-tap-highlight-color: transparent; }
+  .controls button.held { background: var(--pad-active); }
+  .pad8 { width: 222px; grid-template-columns: repeat(3, 74px); grid-template-rows: repeat(3, 74px); }
+  .pad2 { gap: 12px; justify-content: center; }
+  .pad2 button { padding: 14px 22px; font-size: 1.1rem; }
+  footer { margin: 20px 0 8px; font-size: 0.9rem; color: var(--muted); }
+  footer p { margin: 4px 0; }
+  footer a { color: inherit; }
+  /* Each page is the same shell; body[data-sketch] picks its hint and its controls. */
+  body[data-sketch="controllable-rectangle"] .for-controllable-rectangle,
+  body[data-sketch="rectangle-changing-size"] .for-rectangle-changing-size,
+  body[data-sketch="bouncing-rectangle"] .for-bouncing-rectangle { display: inline; }
+  /* html.touch is set in <head> on touch devices (a coarse pointer or any touch points). */
+  html.touch body[data-sketch="controllable-rectangle"] .controls.for-controllable-rectangle { display: grid; }
+  html.touch body[data-sketch="rectangle-changing-size"] .controls.for-rectangle-changing-size { display: flex; }
+  html.touch .keys-hint { display: none !important; }
+  html:not(.touch) .touch-hint { display: none !important; }
+  html:not(.touch) .controls { display: none !important; }
+</style>
+</head>
+<body data-sketch="@SLUG@">
+<main>
+  <nav aria-label="Sketches">
+    <a href="index.html">All sketches</a>
+    <a href="controllable-rectangle.html" data-slug="controllable-rectangle">Controllable Rectangle</a>
+    <a href="rectangle-changing-size.html" data-slug="rectangle-changing-size">Rectangle Changing Size</a>
+    <a href="bouncing-rectangle.html" data-slug="bouncing-rectangle">Bouncing Rectangle</a>
+  </nav>
+  <h1>@TITLE@</h1>
+  <p class="hint">
+    <span class="for-controllable-rectangle"><span class="keys-hint">Hold the arrow keys (two at once for a diagonal) to move the rectangle.</span><span class="touch-hint">Hold the arrows below to move the rectangle; the corner buttons move it diagonally.</span></span>
+    <span class="for-rectangle-changing-size"><span class="keys-hint">Hold the up arrow to grow the rectangle and the down arrow to shrink it.</span><span class="touch-hint">Hold Grow or Shrink below to change the rectangle's size.</span></span>
+    <span class="for-bouncing-rectangle">A square bounces off the edges, changing colour as it goes. Nothing to press: just watch.</span>
+  </p>
+  <canvas id="canvas" width="@WIDTH@" height="@HEIGHT@" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas>
+  <div id="status">Loading…</div>
+
+  <div class="controls pad8 for-controllable-rectangle" aria-label="On-screen arrow keys">
+    <button data-keys="ArrowUp ArrowLeft" aria-label="Up and left">◤</button>
+    <button data-keys="ArrowUp" aria-label="Up">▲</button>
+    <button data-keys="ArrowUp ArrowRight" aria-label="Up and right">◥</button>
+    <button data-keys="ArrowLeft" aria-label="Left">◀</button>
+    <span></span>
+    <button data-keys="ArrowRight" aria-label="Right">▶</button>
+    <button data-keys="ArrowDown ArrowLeft" aria-label="Down and left">◣</button>
+    <button data-keys="ArrowDown" aria-label="Down">▼</button>
+    <button data-keys="ArrowDown ArrowRight" aria-label="Down and right">◢</button>
+  </div>
+  <div class="controls pad2 for-rectangle-changing-size" aria-label="On-screen size keys">
+    <button data-keys="ArrowUp" aria-label="Grow (up arrow)">▲ Grow</button>
+    <button data-keys="ArrowDown" aria-label="Shrink (down arrow)">▼ Shrink</button>
+  </div>
+
+  <footer>
+    <p>Source: <a href="https://github.com/dmccoystephenson/sdl-sketches">dmccoystephenson/sdl-sketches</a>, built with <a href="https://emscripten.org">Emscripten</a> from the original C++ and SDL2 code.</p>
+    <p><a href="https://danielstephenson.dev/play">More by Daniel Stephenson → danielstephenson.dev/play</a></p>
+  </footer>
+</main>
+<script>
+  // SDL_CreateWindow sets the page title to the window's title; the page keeps its own.
+  var pageTitle = document.title;
+  new MutationObserver(function () {
+    if (document.title !== pageTitle) { document.title = pageTitle; }
+  }).observe(document.head, { childList: true, subtree: true, characterData: true });
+
+  var sketch = document.body.dataset.sketch;
+  document.querySelectorAll('nav a[data-slug]').forEach(function (link) {
+    if (link.dataset.slug === sketch) { link.setAttribute('aria-current', 'page'); }
+  });
+
+  var statusEl = document.getElementById('status');
+  var Module = {
+    canvas: document.getElementById('canvas'),
+    print: function (text) { console.log(text); },
+    printErr: function (text) { console.warn(text); },
+    setStatus: function (text) { statusEl.textContent = text; },
+    monitorRunDependencies: function (left) {
+      statusEl.textContent = left ? 'Loading…' : '';
+    },
+    onRuntimeInitialized: function () { statusEl.textContent = ''; }
+  };
+  window.addEventListener('error', function () { statusEl.textContent = 'Something went wrong; reload the page to try again.'; });
+
+  // The on-screen buttons send the same key events the keyboard does, so the sketch reads
+  // them exactly as it reads the arrow keys (SDL_GetKeyboardState).
+  var KEY_CODES = { ArrowLeft: 37, ArrowUp: 38, ArrowRight: 39, ArrowDown: 40 };
+  // How many buttons currently hold each key, so a key shared by two held buttons (an
+  // arrow and a corner) is released only when the last of them is.
+  var holders = {};
+  function sendKey(type, key) {
+    var code = KEY_CODES[key];
+    var ev = new KeyboardEvent(type, { key: key, code: key, bubbles: true, cancelable: true });
+    Object.defineProperty(ev, 'keyCode', { get: function () { return code; } });
+    Object.defineProperty(ev, 'which', { get: function () { return code; } });
+    window.dispatchEvent(ev);
+  }
+  function hold(key) {
+    holders[key] = (holders[key] || 0) + 1;
+    if (holders[key] === 1) { sendKey('keydown', key); }
+  }
+  function letGo(key) {
+    holders[key] = Math.max(0, (holders[key] || 0) - 1);
+    if (holders[key] === 0) { sendKey('keyup', key); }
+  }
+  document.querySelectorAll('.controls button').forEach(function (button) {
+    var keys = button.dataset.keys.split(' ');
+    // A quick tap is held for at least MIN_HOLD_MS so that it still moves a little: a press
+    // and release inside one frame would otherwise be missed by the sketch.
+    var MIN_HOLD_MS = 120;
+    var held = false, pressedAt = 0, pendingRelease = null;
+    function releaseKeys() { keys.forEach(letGo); }
+    function press(e) {
+      e.preventDefault();
+      if (held) return;
+      if (pendingRelease) { clearTimeout(pendingRelease); pendingRelease = null; releaseKeys(); }
+      held = true; pressedAt = performance.now(); button.classList.add('held'); keys.forEach(hold);
+    }
+    function release(e) {
+      e.preventDefault();
+      if (!held) return;
+      held = false; button.classList.remove('held');
+      pendingRelease = setTimeout(function () { pendingRelease = null; releaseKeys(); },
+        Math.max(0, MIN_HOLD_MS - (performance.now() - pressedAt)));
+    }
+    button.addEventListener('pointerdown', press);
+    button.addEventListener('pointerup', release);
+    button.addEventListener('pointercancel', release);
+    button.addEventListener('pointerleave', release);
+    button.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  });
+</script>
+{{{ SCRIPT }}}
+</body>
+</html>

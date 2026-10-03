@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDL Sketches</title>
+<meta name="description" content="Three small C++ and SDL2 sketches by Daniel Stephenson, running in the browser with Emscripten.">
+<style>
+  :root { --bg: #f5f4f0; --fg: #1f1e1b; --muted: #5f5d57; --line: #d9d6cd; --card: #ffffff; --accent: #2b5d8a; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151514; --fg: #e8e6e0; --muted: #a29f97; --line: #393833; --card: #1f1e1c; --accent: #8ab8e0; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 820px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 1.6rem; margin: 0 0 6px; }
+  .lede { color: var(--muted); margin: 0 0 20px; line-height: 1.5; }
+  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  li a { display: block; padding: 16px; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--card); color: inherit; text-decoration: none; }
+  li a:hover, li a:focus-visible { border-color: var(--accent); }
+  li strong { display: block; font-size: 1.1rem; color: var(--accent); margin-bottom: 4px; }
+  li span { color: var(--muted); line-height: 1.45; }
+  footer { margin: 28px 0 8px; font-size: 0.9rem; color: var(--muted); }
+  footer p { margin: 4px 0; }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <h1>SDL Sketches</h1>
+  <p class="lede">Three small programs written in C++ with SDL2 in January 2020, each from its own repository, compiled unchanged to WebAssembly with Emscripten. Pick one; each page links to the other two.</p>
+  <ul>
+    <li><a href="controllable-rectangle.html"><strong>Controllable Rectangle</strong><span>Move a black square around with the arrow keys, diagonals included. On a phone, on-screen arrows appear under it.</span></a></li>
+    <li><a href="rectangle-changing-size.html"><strong>Rectangle Changing Size</strong><span>Grow the square with the up arrow and shrink it with the down arrow, or with the Grow and Shrink buttons on a phone.</span></a></li>
+    <li><a href="bouncing-rectangle.html"><strong>Bouncing Rectangle</strong><span>A square bounces around the window, shifting colour each time it hits an edge. Nothing to press.</span></a></li>
+  </ul>
+  <footer>
+    <p>Sources: <a href="https://github.com/dmccoystephenson/Controllable-Rectangle">Controllable-Rectangle</a>, <a href="https://github.com/dmccoystephenson/Rectangle-Changing-Size">Rectangle-Changing-Size</a>, <a href="https://github.com/dmccoystephenson/Bouncing-Rectangle-Using-SDL">Bouncing-Rectangle-Using-SDL</a>; browser build: <a href="https://github.com/dmccoystephenson/sdl-sketches">dmccoystephenson/sdl-sketches</a>.</p>
+    <p><a href="https://danielstephenson.dev/play">More by Daniel Stephenson → danielstephenson.dev/play</a></p>
+  </footer>
+</main>
+</body>
+</html>

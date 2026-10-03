@@ -1,0 +1,9 @@
+[submodule "sketches/controllable-rectangle"]
+	path = sketches/controllable-rectangle
+	url = https://github.com/dmccoystephenson/Controllable-Rectangle
+[submodule "sketches/rectangle-changing-size"]
+	path = sketches/rectangle-changing-size
+	url = https://github.com/dmccoystephenson/Rectangle-Changing-Size
+[submodule "sketches/bouncing-rectangle"]
+	path = sketches/bouncing-rectangle
+	url = https://github.com/dmccoystephenson/Bouncing-Rectangle-Using-SDL

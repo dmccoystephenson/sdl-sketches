@@ -1,0 +1,3 @@
+# the browser build (web/build.sh)
+web/build/
+web/arcade-version.txt

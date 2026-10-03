@@ -1,0 +1,42 @@
+# Builds the three sketches for the browser with web/build.sh and, when enabled, deploys
+# the site to arcade as https://sdl-sketches.play.danielstephenson.dev
+name: Browser build
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # the sketches are git submodules pinned to commits of their own repositories
+          submodules: true
+      - uses: mymindstorm/setup-emsdk@v16
+        with:
+          version: 6.0.10
+      - name: Build (web/build.sh)
+        run: web/build.sh
+      - name: Check the pages, scripts and modules exist
+        run: |
+          test -s web/build/index.html
+          for sketch in controllable-rectangle rectangle-changing-size bouncing-rectangle; do
+            test -s "web/build/$sketch.html"
+            test -s "web/build/$sketch.js"
+            test -s "web/build/$sketch.wasm"
+            grep -Fq 'https://danielstephenson.dev/play' "web/build/$sketch.html"
+          done
+      - name: Write the deploy version
+        run: echo "$(tr -d '[:space:]' < version.txt)+g${GITHUB_SHA::7}" > web/arcade-version.txt && cat web/arcade-version.txt
+      - name: Deploy to arcade
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && vars.ARCADE_ENABLED == 'true')
+        uses: Stephenson-Software/arcade-deploy@v1
+        with:
+          slug: sdl-sketches
+          token: ${{ secrets.ARCADE_TOKEN }}
+          site-dir: web/build
+          version-file: web/arcade-version.txt
