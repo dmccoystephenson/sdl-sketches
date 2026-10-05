@@ -11,6 +11,19 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# Both prerequisites are checked before the old output is removed, so a run that cannot
+# build says what is missing and leaves the last build in place.
+if ! command -v em++ > /dev/null; then
+  echo "web/build.sh: em++ not found; install the Emscripten SDK and source emsdk_env.sh first" >&2
+  exit 1
+fi
+while read -r _ submodule; do
+  if [ ! -e "$submodule/.git" ]; then
+    echo "web/build.sh: $submodule is not checked out; run git submodule update --init first" >&2
+    exit 1
+  fi
+done < <(git config --file .gitmodules --get-regexp '\.path$')
+
 out=web/build
 rm -rf "$out"
 mkdir -p "$out"
