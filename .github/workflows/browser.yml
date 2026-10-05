@@ -23,14 +23,17 @@ jobs:
         run: web/build.sh
       - name: Check the pages, scripts and modules exist
         run: |
+          # trace each check, so the log shows which one failed
+          set -x
           test -s web/build/index.html
           for sketch in controllable-rectangle rectangle-changing-size bouncing-rectangle; do
             test -s "web/build/$sketch.html"
             test -s "web/build/$sketch.js"
             test -s "web/build/$sketch.wasm"
             grep -Fq 'https://danielstephenson.dev/play' "web/build/$sketch.html"
-            # the page loads its own script into the canvas the shell provides
-            grep -Fq 'id="canvas"' "web/build/$sketch.html"
+            # the page loads its own script into the canvas the shell provides (em++ -O2
+            # minifies the page, which may drop attribute quotes)
+            grep -Eq 'id="?canvas' "web/build/$sketch.html"
             grep -Fq "$sketch.js" "web/build/$sketch.html"
             # every shell placeholder was substituted, by web/build.sh's sed and by em++ (an
             # if, not `! grep`, because set -e ignores a negated command's failure)
