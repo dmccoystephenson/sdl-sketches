@@ -12,7 +12,7 @@ jobs:
   browser:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # the sketches are git submodules pinned to commits of their own repositories
           submodules: true
@@ -35,6 +35,9 @@ jobs:
             # minifies the page, which may drop attribute quotes)
             grep -Eq 'id="?canvas' "web/build/$sketch.html"
             grep -Fq "$sketch.js" "web/build/$sketch.html"
+            # the on-screen control groups keep the role that lets screen readers announce
+            # their aria-label (every page carries both groups; CSS shows the page's own)
+            test "$(grep -Eo 'role="?group' "web/build/$sketch.html" | wc -l)" -eq 2
             # every shell placeholder was substituted, by web/build.sh's sed and by em++ (an
             # if, not `! grep`, because set -e ignores a negated command's failure)
             if grep -Eq '@[A-Z]+@' "web/build/$sketch.html"; then exit 1; fi

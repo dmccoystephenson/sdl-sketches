@@ -68,7 +68,7 @@
   <canvas id="canvas" width="@WIDTH@" height="@HEIGHT@" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas>
   <div id="status">Loading…</div>
 
-  <div class="controls pad8 for-controllable-rectangle" aria-label="On-screen arrow keys">
+  <div class="controls pad8 for-controllable-rectangle" role="group" aria-label="On-screen arrow keys">
     <button data-keys="ArrowUp ArrowLeft" aria-label="Up and left">◤</button>
     <button data-keys="ArrowUp" aria-label="Up">▲</button>
     <button data-keys="ArrowUp ArrowRight" aria-label="Up and right">◥</button>
@@ -79,7 +79,7 @@
     <button data-keys="ArrowDown" aria-label="Down">▼</button>
     <button data-keys="ArrowDown ArrowRight" aria-label="Down and right">◢</button>
   </div>
-  <div class="controls pad2 for-rectangle-changing-size" aria-label="On-screen size keys">
+  <div class="controls pad2 for-rectangle-changing-size" role="group" aria-label="On-screen size keys">
     <button data-keys="ArrowUp" aria-label="Grow (up arrow)">▲ Grow</button>
     <button data-keys="ArrowDown" aria-label="Shrink (down arrow)">▼ Shrink</button>
   </div>
