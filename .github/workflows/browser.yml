@@ -26,7 +26,9 @@ jobs:
           # trace each check, so the log shows which one failed
           set -x
           test -s web/build/index.html
-          for sketch in controllable-rectangle rectangle-changing-size bouncing-rectangle; do
+          grep -Fq 'https://danielstephenson.dev/play' web/build/index.html
+          sketches="controllable-rectangle rectangle-changing-size bouncing-rectangle"
+          for sketch in $sketches; do
             test -s "web/build/$sketch.html"
             test -s "web/build/$sketch.js"
             test -s "web/build/$sketch.wasm"
@@ -35,6 +37,11 @@ jobs:
             # minifies the page, which may drop attribute quotes)
             grep -Eq 'id="?canvas' "web/build/$sketch.html"
             grep -Fq "$sketch.js" "web/build/$sketch.html"
+            # the nav links back to the index and to every sketch, this one included
+            grep -Eq 'href="?index\.html' "web/build/$sketch.html"
+            for other in $sketches; do
+              grep -Eq "href=\"?$other\\.html" "web/build/$sketch.html"
+            done
             # the on-screen control groups keep the role that lets screen readers announce
             # their aria-label (every page carries both groups; CSS shows the page's own)
             test "$(grep -Eo 'role="?group' "web/build/$sketch.html" | wc -l)" -eq 2
