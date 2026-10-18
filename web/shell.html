@@ -65,8 +65,8 @@
     <span class="for-rectangle-changing-size"><span class="keys-hint">Hold the up arrow to grow the rectangle and the down arrow to shrink it.</span><span class="touch-hint">Hold Grow or Shrink below to change the rectangle's size.</span></span>
     <span class="for-bouncing-rectangle">A square bounces off the edges, changing colour as it goes. Nothing to press: just watch.</span>
   </p>
-  <canvas id="canvas" width="@WIDTH@" height="@HEIGHT@" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas>
-  <div id="status">Loading…</div>
+  <canvas id="canvas" width="@WIDTH@" height="@HEIGHT@" tabindex="-1" role="img" aria-label="@TITLE@ sketch" oncontextmenu="event.preventDefault()"></canvas>
+  <div id="status" role="status">Loading…</div>
 
   <div class="controls pad8 for-controllable-rectangle" role="group" aria-label="On-screen arrow keys">
     <button data-keys="ArrowUp ArrowLeft" aria-label="Up and left">◤</button>
