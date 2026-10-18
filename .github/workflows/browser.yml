@@ -45,9 +45,12 @@ jobs:
             # the on-screen control groups keep the role that lets screen readers announce
             # their aria-label (every page carries both groups; CSS shows the page's own)
             test "$(grep -Eo 'role="?group' "web/build/$sketch.html" | wc -l)" -eq 2
-            # the canvas has an accessible name, and the loading/error line is announced
-            grep -Eq 'role="?img"? aria-label=' "web/build/$sketch.html"
-            grep -Eq 'id="?status"? role="?status' "web/build/$sketch.html"
+            # the canvas has an accessible name, and the loading/error line is announced (the
+            # minifier may reorder attributes, so each is matched within its own tag)
+            canvas_tag=$(grep -Eo '<canvas[^>]*>' "web/build/$sketch.html")
+            grep -Eq 'role="?img' <<< "$canvas_tag"
+            grep -Eq 'aria-label="?[^">]* sketch' <<< "$canvas_tag"
+            grep -Eq '<div[^>]*role="?status' "web/build/$sketch.html"
             # every shell placeholder was substituted, by web/build.sh's sed and by em++ (an
             # if, not `! grep`, because set -e ignores a negated command's failure)
             if grep -Eq '@[A-Z]+@' "web/build/$sketch.html"; then exit 1; fi
