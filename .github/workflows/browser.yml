@@ -51,6 +51,10 @@ jobs:
             grep -Eq 'role="?img' <<< "$canvas_tag"
             grep -Eq 'aria-label="?[^">]* sketch' <<< "$canvas_tag"
             grep -Eq '<div[^>]*role="?status' "web/build/$sketch.html"
+            # the page can still be pinch-zoomed (touch-action: none on the canvas and the
+            # buttons already keeps gestures that start on them off the page)
+            if grep -Eiq 'user-scalable=(no|0)' "web/build/$sketch.html"; then exit 1; fi
+            if grep -Eiq 'maximum-scale=' "web/build/$sketch.html"; then exit 1; fi
             # every shell placeholder was substituted, by web/build.sh's sed and by em++ (an
             # if, not `! grep`, because set -e ignores a negated command's failure)
             if grep -Eq '@[A-Z]+@' "web/build/$sketch.html"; then exit 1; fi
