@@ -42,6 +42,12 @@ jobs:
             for other in $sketches; do
               grep -Eq "href=\"?$other\\.html" "web/build/$sketch.html"
             done
+            # the page names its sketch on <body>, which picks its hint and controls and marks
+            # its nav link, and the shell has a hint for it and the rule that shows it (the
+            # minifier may drop attribute and selector quotes)
+            grep -Eq "<body[^>]* data-sketch=\"?$sketch[\" >]" "web/build/$sketch.html"
+            grep -Eq "class=\"?for-$sketch[\" >]" "web/build/$sketch.html"
+            grep -Eq "data-sketch=\"?$sketch\"?\] *\.for-$sketch" "web/build/$sketch.html"
             # the on-screen control groups keep the role that lets screen readers announce
             # their aria-label (every page carries both groups; CSS shows the page's own)
             test "$(grep -Eo 'role="?group' "web/build/$sketch.html" | wc -l)" -eq 2
