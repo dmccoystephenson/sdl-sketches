@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Builds the three sketches for the browser into web/build/: index.html (the page that
-# switches between them) plus <sketch>.html, <sketch>.js and <sketch>.wasm for each.
+# Builds the three sketches for the browser into web/build/: index.html (a copy of
+# web/index.html, which lists them) plus <sketch>.html, <sketch>.js and <sketch>.wasm for
+# each.
 # Needs Emscripten's em++ on PATH (source emsdk_env.sh first) and the submodules checked
 # out (git submodule update --init).
 #
