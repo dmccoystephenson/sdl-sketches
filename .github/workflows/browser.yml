@@ -57,6 +57,16 @@ jobs:
             grep -Eq 'role="?img' <<< "$canvas_tag"
             grep -Eq 'aria-label="?[^">]* sketch' <<< "$canvas_tag"
             grep -Eq '<div[^>]*role="?status' "web/build/$sketch.html"
+            # the canvas is the size of the sketch's own window, so the width and height
+            # web/build.sh passes for it cannot drift from the source it builds (each sketch
+            # opens its window with SDL_CreateWindow(..., SCREEN_WIDTH, SCREEN_HEIGHT, ...))
+            source=$(grep -l 'SDL_CreateWindow' "sketches/$sketch"/*.cpp)
+            grep -Fq 'SCREEN_WIDTH, SCREEN_HEIGHT' "$source"
+            width=$(grep -Eo 'SCREEN_WIDTH = [0-9]+' "$source" | grep -Eo '[0-9]+')
+            height=$(grep -Eo 'SCREEN_HEIGHT = [0-9]+' "$source" | grep -Eo '[0-9]+')
+            # (the minifier may also drop the space after a quoted value, as in `"height=700`)
+            grep -Eq "[ \"]width=\"?$width[\" >]" <<< "$canvas_tag"
+            grep -Eq "[ \"]height=\"?$height[\" >]" <<< "$canvas_tag"
             # the page can still be pinch-zoomed (touch-action: none on the canvas and the
             # buttons already keeps gestures that start on them off the page)
             if grep -Eiq 'user-scalable=(no|0)' "web/build/$sketch.html"; then exit 1; fi
