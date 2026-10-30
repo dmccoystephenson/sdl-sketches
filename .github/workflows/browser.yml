@@ -28,6 +28,18 @@ jobs:
           test -s web/build/index.html
           grep -Fq 'https://danielstephenson.dev/play' web/build/index.html
           sketches="controllable-rectangle rectangle-changing-size bouncing-rectangle"
+          # the list above is every submodule and every page web/build.sh built, so a sketch
+          # added to (or dropped from) either of them cannot skip the checks below
+          expected=$(printf '%s\n' $sketches | sort | xargs)
+          submodules=$(git config --file .gitmodules --get-regexp '\.path$' | sed 's|.* sketches/||' | sort | xargs)
+          test "$submodules" = "$expected"
+          pages=$(ls web/build/*.html | sed -e 's|^web/build/||' -e 's|\.html$||' | grep -vx index | sort | xargs)
+          test "$pages" = "$expected"
+          # the index and the README link each sketch's own repository, as .gitmodules names it
+          for url in $(git config --file .gitmodules --get-regexp '\.url$' | cut -d' ' -f2); do
+            grep -Fq "href=\"$url\"" web/build/index.html
+            grep -Fq "]($url)" README.md
+          done
           for sketch in $sketches; do
             test -s "web/build/$sketch.html"
             test -s "web/build/$sketch.js"
