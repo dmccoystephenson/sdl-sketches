@@ -88,6 +88,13 @@ jobs:
             if grep -Eq '@[A-Z]+@' "web/build/$sketch.html"; then exit 1; fi
             if grep -Fq '{{{ SCRIPT }}}' "web/build/$sketch.html"; then exit 1; fi
             grep -Fq "href=\"$sketch.html\"" web/build/index.html
+            # the title web/build.sh passes for the sketch (the page's <h1>) is also the text of
+            # its nav link, of its entry in index.html and of its row in the README's table
+            title=$(grep -Eo '<h1>[^<]+' "web/build/$sketch.html" | sed 's|<h1>||')
+            test -n "$title"
+            grep -Fq ">$title</a>" "web/build/$sketch.html"
+            grep -Fq "<strong>$title</strong>" web/build/index.html
+            grep -Fq "| $title | " README.md
           done
       - name: Write the deploy version
         run: echo "$(tr -d '[:space:]' < version.txt)+g${GITHUB_SHA::7}" > web/arcade-version.txt && cat web/arcade-version.txt
