@@ -113,8 +113,7 @@
     onRuntimeInitialized: function () { statusEl.textContent = ''; }
   };
   // A <script> that cannot be fetched reports an error that does not bubble, so this listens
-  // in the capture phase; a rejected promise, which is how anything resumed from frame.h's
-  // await fails, never fires 'error' at all.
+  // in the capture phase; a rejected promise never fires 'error' at all.
   function showFailure() { statusEl.textContent = 'Something went wrong; reload the page to try again.'; }
   window.addEventListener('error', showFailure, true);
   window.addEventListener('unhandledrejection', showFailure);
