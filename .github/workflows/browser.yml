@@ -27,6 +27,11 @@ jobs:
           set -x
           test -s web/build/index.html
           grep -Fq 'https://danielstephenson.dev/play' web/build/index.html
+          # the status line reports a script that cannot be fetched (an error that does not
+          # bubble, so seen only in the capture phase) and a rejected promise; this reads the
+          # shell because the minifier may rewrite the built page's `true`
+          grep -Eq "addEventListener\('error', [A-Za-z]+, true\)" web/shell.html
+          grep -Fq "addEventListener('unhandledrejection'" web/shell.html
           sketches="controllable-rectangle rectangle-changing-size bouncing-rectangle"
           # the list above is every submodule and every page web/build.sh built, so a sketch
           # added to (or dropped from) either of them cannot skip the checks below
