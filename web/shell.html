@@ -112,7 +112,11 @@
     },
     onRuntimeInitialized: function () { statusEl.textContent = ''; }
   };
-  window.addEventListener('error', function () { statusEl.textContent = 'Something went wrong; reload the page to try again.'; });
+  // A <script> that cannot be fetched reports an error that does not bubble, so this listens
+  // in the capture phase; a rejected promise never fires 'error' at all.
+  function showFailure() { statusEl.textContent = 'Something went wrong; reload the page to try again.'; }
+  window.addEventListener('error', showFailure, true);
+  window.addEventListener('unhandledrejection', showFailure);
 
   // The on-screen buttons send the same key events the keyboard does, so the sketch reads
   // them exactly as it reads the arrow keys (SDL_GetKeyboardState).
