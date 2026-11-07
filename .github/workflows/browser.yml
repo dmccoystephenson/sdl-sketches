@@ -77,7 +77,7 @@ jobs:
             # without JavaScript the page hides that line, which only script ever changes, and
             # says the sketch needs JavaScript instead of claiming to be loading
             grep -Eq '<noscript><style[^>]*>#status' "web/build/$sketch.html"
-            grep -Fq 'needs JavaScript' "web/build/$sketch.html"
+            grep -Eq '<noscript><p[^>]*>This sketch needs JavaScript' "web/build/$sketch.html"
             # the canvas is the size of the sketch's own window, so the width and height
             # web/build.sh passes for it cannot drift from the source it builds (each sketch
             # opens its window with SDL_CreateWindow(..., SCREEN_WIDTH, SCREEN_HEIGHT, ...))
