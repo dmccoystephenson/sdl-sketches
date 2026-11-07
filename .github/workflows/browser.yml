@@ -74,6 +74,10 @@ jobs:
             grep -Eq 'role="?img' <<< "$canvas_tag"
             grep -Eq 'aria-label="?[^">]* sketch' <<< "$canvas_tag"
             grep -Eq '<div[^>]*role="?status' "web/build/$sketch.html"
+            # without JavaScript the page hides that line, which only script ever changes, and
+            # says the sketch needs JavaScript instead of claiming to be loading
+            grep -Eq '<noscript><style[^>]*>#status' "web/build/$sketch.html"
+            grep -Fq 'needs JavaScript' "web/build/$sketch.html"
             # the canvas is the size of the sketch's own window, so the width and height
             # web/build.sh passes for it cannot drift from the source it builds (each sketch
             # opens its window with SDL_CreateWindow(..., SCREEN_WIDTH, SCREEN_HEIGHT, ...))
@@ -100,6 +104,10 @@ jobs:
             grep -Fq ">$title</a>" "web/build/$sketch.html"
             grep -Fq "<strong>$title</strong>" web/build/index.html
             grep -Fq "| $title | " README.md
+            # the page has a description of its own for links and search results, as the index
+            # does (the minifier may reorder the tag's attributes and drop their quotes)
+            description_tag=$(grep -Eo '<meta[^>]*>' "web/build/$sketch.html" | grep -E 'name="?description')
+            grep -Fq "content=\"$title, " <<< "$description_tag"
           done
       - name: Write the deploy version
         run: echo "$(tr -d '[:space:]' < version.txt)+g${GITHUB_SHA::7}" > web/arcade-version.txt && cat web/arcade-version.txt
