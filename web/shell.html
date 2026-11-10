@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>@TITLE@ · SDL Sketches</title>
+<meta name="description" content="@TITLE@, a small C++ and SDL2 sketch by Daniel Stephenson, running in the browser with Emscripten.">
+<!-- Only script ever changes the status line, so without script it would say Loading… for good. -->
+<noscript><style>#status { display: none; }</style></noscript>
 <script>
   // Touch devices get the on-screen controls in place of the keyboard hint.
   if (window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0) {
@@ -28,7 +31,7 @@
   #canvas { display: block; width: 100% !important; height: auto !important;
     aspect-ratio: @WIDTH@ / @HEIGHT@; margin: 0 auto; background: #fff; outline: none;
     border: 1px solid var(--line); touch-action: none; }
-  #status { color: var(--muted); margin: 8px 0; min-height: 1.2em; }
+  #status, noscript p { color: var(--muted); margin: 8px 0; min-height: 1.2em; }
   .controls { margin: 12px auto 0; user-select: none; -webkit-user-select: none; }
   .controls button { font: inherit; font-size: 1.4rem; border: 0; border-radius: 14px; margin: 3px;
     background: var(--pad); color: var(--fg); touch-action: none; -webkit-tap-highlight-color: transparent; }
@@ -67,6 +70,7 @@
   </p>
   <canvas id="canvas" width="@WIDTH@" height="@HEIGHT@" tabindex="-1" role="img" aria-label="@TITLE@ sketch" oncontextmenu="event.preventDefault()"></canvas>
   <div id="status" role="status">Loading…</div>
+  <noscript><p>This sketch needs JavaScript to run. Turn it on and reload the page.</p></noscript>
 
   <div class="controls pad8 for-controllable-rectangle" role="group" aria-label="On-screen arrow keys">
     <button data-keys="ArrowUp ArrowLeft" aria-label="Up and left">◤</button>
