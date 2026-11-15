@@ -148,16 +148,18 @@
     // A quick tap is held for at least MIN_HOLD_MS so that it still moves a little: a press
     // and release inside one frame would otherwise be missed by the sketch.
     var MIN_HOLD_MS = 120;
-    var held = false, pressedAt = 0, pendingRelease = null;
+    var held = false, pressedAt = 0, pendingRelease = null, lastPointerAt = -Infinity;
     function releaseKeys() { keys.forEach(letGo); }
     function press(e) {
       e.preventDefault();
+      lastPointerAt = performance.now();
       if (held) return;
       if (pendingRelease) { clearTimeout(pendingRelease); pendingRelease = null; releaseKeys(); }
       held = true; pressedAt = performance.now(); button.classList.add('held'); keys.forEach(hold);
     }
     function release(e) {
       e.preventDefault();
+      lastPointerAt = performance.now();
       if (!held) return;
       held = false; button.classList.remove('held');
       pendingRelease = setTimeout(function () { pendingRelease = null; releaseKeys(); },
@@ -167,6 +169,14 @@
     button.addEventListener('pointerup', release);
     button.addEventListener('pointercancel', release);
     button.addEventListener('pointerleave', release);
+    // Enter or Space on a focused button, and a screen reader's activate gesture, send a click
+    // with no pointer events, so such a click counts as a tap. The click that follows a
+    // pointer press and release is ignored, as press and release have already handled it.
+    button.addEventListener('click', function () {
+      if (held || pendingRelease || performance.now() - lastPointerAt < 500) return;
+      keys.forEach(hold);
+      pendingRelease = setTimeout(function () { pendingRelease = null; releaseKeys(); }, MIN_HOLD_MS);
+    });
     button.addEventListener('contextmenu', function (e) { e.preventDefault(); });
   });
 </script>

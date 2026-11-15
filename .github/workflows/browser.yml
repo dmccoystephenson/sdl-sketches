@@ -32,6 +32,9 @@ jobs:
           # shell because the minifier may rewrite the built page's `true`
           grep -Eq "addEventListener\('error', [A-Za-z]+, true\)" web/shell.html
           grep -Fq "addEventListener('unhandledrejection'" web/shell.html
+          # the on-screen buttons also answer a click, which is all the keyboard (Enter or
+          # Space) and a screen reader's activate gesture send
+          grep -Fq "button.addEventListener('click'" web/shell.html
           sketches="controllable-rectangle rectangle-changing-size bouncing-rectangle"
           # the list above is every submodule and every page web/build.sh built, so a sketch
           # added to (or dropped from) either of them cannot skip the checks below
