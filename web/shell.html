@@ -39,6 +39,11 @@
   .pad8 { width: 222px; grid-template-columns: repeat(3, 74px); grid-template-rows: repeat(3, 74px); }
   .pad2 { gap: 12px; justify-content: center; }
   .pad2 button { padding: 14px 22px; font-size: 1.1rem; }
+  /* Hidden except on the page whose sketch moves by itself (the rule below shows it). */
+  .pause { display: none; font: inherit; margin: 12px auto 0; padding: 10px 22px; border: 0; border-radius: 14px;
+    background: var(--pad); color: var(--fg); cursor: pointer; }
+  .pause[aria-pressed="true"] { background: var(--pad-active); }
+  .pause:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   footer { margin: 20px 0 8px; font-size: 0.9rem; color: var(--muted); }
   footer p { margin: 4px 0; }
   footer a { color: inherit; }
@@ -46,6 +51,7 @@
   body[data-sketch="controllable-rectangle"] .for-controllable-rectangle,
   body[data-sketch="rectangle-changing-size"] .for-rectangle-changing-size,
   body[data-sketch="bouncing-rectangle"] .for-bouncing-rectangle { display: inline; }
+  body[data-sketch="bouncing-rectangle"] .pause.for-bouncing-rectangle { display: block; }
   /* html.touch is set in <head> on touch devices (a coarse pointer or any touch points). */
   html.touch body[data-sketch="controllable-rectangle"] .controls.for-controllable-rectangle { display: grid; }
   html.touch body[data-sketch="rectangle-changing-size"] .controls.for-rectangle-changing-size { display: flex; }
@@ -66,11 +72,12 @@
   <p class="hint">
     <span class="for-controllable-rectangle"><span class="keys-hint">Hold the arrow keys (two at once for a diagonal) to move the rectangle.</span><span class="touch-hint">Hold the arrows below to move the rectangle; the corner buttons move it diagonally.</span></span>
     <span class="for-rectangle-changing-size"><span class="keys-hint">Hold the up arrow to grow the rectangle and the down arrow to shrink it.</span><span class="touch-hint">Hold Grow or Shrink below to change the rectangle's size.</span></span>
-    <span class="for-bouncing-rectangle">A square bounces off the edges, changing colour as it goes. Nothing to press: just watch.</span>
+    <span class="for-bouncing-rectangle">A square bounces off the edges, changing colour as it goes. Pause below stops it where it is; it starts paused if your device asks for reduced motion.</span>
   </p>
   <canvas id="canvas" width="@WIDTH@" height="@HEIGHT@" tabindex="-1" role="img" aria-label="@TITLE@ sketch" oncontextmenu="event.preventDefault()"></canvas>
   <div id="status" role="status">Loading…</div>
   <noscript><p>This sketch needs JavaScript to run. Turn it on and reload the page.</p></noscript>
+  <button type="button" id="pause" class="pause for-bouncing-rectangle" aria-pressed="false">Pause</button>
 
   <div class="controls pad8 for-controllable-rectangle" role="group" aria-label="On-screen arrow keys">
     <button data-keys="ArrowUp ArrowLeft" aria-label="Up and left">◤</button>
@@ -121,6 +128,20 @@
   function showFailure() { statusEl.textContent = 'Something went wrong; reload the page to try again.'; }
   window.addEventListener('error', showFailure, true);
   window.addEventListener('unhandledrejection', showFailure);
+
+  // A sketch that moves by itself can be paused (WCAG 2.2.2): web/frame.h keeps waiting for
+  // the next frame while Module['sketchPaused'] is set. The button is shown only on such a
+  // page, and there the sketch starts paused when the device asks for reduced motion. The
+  // label stays "Pause" and aria-pressed says whether it is in effect, as for any toggle.
+  var pauseButton = document.getElementById('pause');
+  function setPaused(paused) {
+    Module['sketchPaused'] = paused;
+    pauseButton.setAttribute('aria-pressed', paused ? 'true' : 'false');
+  }
+  if (getComputedStyle(pauseButton).display !== 'none') {
+    setPaused(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+  pauseButton.addEventListener('click', function () { setPaused(!Module['sketchPaused']); });
 
   // The on-screen buttons send the same key events the keyboard does, so the sketch reads
   // them exactly as it reads the arrow keys (SDL_GetKeyboardState).
