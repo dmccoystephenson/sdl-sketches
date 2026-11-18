@@ -35,6 +35,11 @@ jobs:
           # the on-screen buttons also answer a click, which is all the keyboard (Enter or
           # Space) and a screen reader's activate gesture send
           grep -Fq "button.addEventListener('click'" web/shell.html
+          # the Pause button sets the flag web/frame.h's frame wait loops on, and a device that
+          # asks for reduced motion starts the sketch paused
+          grep -Fq "} while (Module['sketchPaused']);" web/frame.h
+          grep -Fq "Module['sketchPaused'] = paused;" web/shell.html
+          grep -Fq "matchMedia('(prefers-reduced-motion: reduce)')" web/shell.html
           sketches="controllable-rectangle rectangle-changing-size bouncing-rectangle"
           # the list above is every submodule and every page web/build.sh built, so a sketch
           # added to (or dropped from) either of them cannot skip the checks below
@@ -71,6 +76,14 @@ jobs:
             # the on-screen control groups keep the role that lets screen readers announce
             # their aria-label (every page carries both groups; CSS shows the page's own)
             test "$(grep -Eo 'role="?group' "web/build/$sketch.html" | wc -l)" -eq 2
+            # every page carries the Pause toggle (CSS shows it only for Bouncing Rectangle,
+            # which moves by itself), named by its text and reporting its state, and every
+            # sketch's frame wait reads the flag it sets
+            pause_tag=$(grep -Eo '<button[^>]*>' "web/build/$sketch.html" | grep -E 'id="?pause("| |>)')
+            grep -Eq 'aria-pressed="?false' <<< "$pause_tag"
+            grep -Fq 'for-bouncing-rectangle' <<< "$pause_tag"
+            grep -Eq '<button[^>]*id="?pause[^>]*>Pause</button>' "web/build/$sketch.html"
+            grep -Fq 'sketchPaused' "web/build/$sketch.js"
             # the canvas has an accessible name, and the loading/error line is announced (the
             # minifier may reorder attributes, so each is matched within its own tag)
             canvas_tag=$(grep -Eo '<canvas[^>]*>' "web/build/$sketch.html")
